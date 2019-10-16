@@ -6,11 +6,7 @@
 
         <div class="field">
           <div class="control">
-            <textarea
-              class="textarea"
-              placeholder="Textarea"
-              rows="8"
-            ></textarea>
+            {{ current }}
           </div>
         </div>
       </div>
@@ -71,7 +67,7 @@
         <div class="column">
           <div class="field">
             <div class="control">
-              <button class="button is-link is-fullwidth">
+              <button class="button is-link is-fullwidth" @click="fetchRandom">
                 Hit me with a new one!
               </button>
             </div>
@@ -83,8 +79,24 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import * as types from "@/store/modules/todo/types";
+
 export default {
-  name: "home"
+  name: "home",
+  computed: {
+    ...mapState({
+      current: state => state.todo.random.activity
+    })
+  },
+  created() {
+    this.fetchRandom();
+  },
+  methods: {
+    fetchRandom() {
+      this.$store.dispatch(types.ACTION_FETCH_RANDOM);
+    }
+  }
 };
 </script>
 
