@@ -6,7 +6,7 @@
 
         <div class="field">
           <div class="control">
-            {{ current }}
+            {{ current.activity }}
           </div>
         </div>
       </div>
@@ -18,9 +18,15 @@
           <label class="label">Type</label>
           <div class="control">
             <div class="select is-fullwidth">
-              <select>
-                <option>Select dropdown</option>
-                <option>With options</option>
+              <select v-model="type">
+                <option disabled value="">Please select type</option>
+                <option
+                  v-for="option in typeOptions"
+                  v-bind:value="option"
+                  :key="option"
+                >
+                  {{ option }}
+                </option>
               </select>
             </div>
           </div>
@@ -29,7 +35,12 @@
         <div class="field">
           <label class="label">Participants</label>
           <div class="control">
-            <input class="input" type="text" placeholder="Text input" />
+            <input
+              class="input"
+              type="number"
+              placeholder="Participants"
+              v-model="participants"
+            />
           </div>
         </div>
 
@@ -45,6 +56,7 @@
                 step="0.1"
                 name="budget"
                 class="range-input"
+                v-model="price"
               />
               Expensive
             </label>
@@ -58,7 +70,7 @@
         <div class="column">
           <div class="field">
             <div class="control">
-              <button class="button is-primary is-fullwidth">
+              <button class="button is-primary is-fullwidth" @click="addToList">
                 Save for later
               </button>
             </div>
@@ -84,10 +96,45 @@ import * as types from "@/store/modules/todo/types";
 
 export default {
   name: "home",
+  data() {
+    return {
+      participants: 1,
+      price: 0,
+      type: "",
+      typeOptions: [
+        "education",
+        "recreational",
+        "social",
+        "diy",
+        "charity",
+        "cooking",
+        "relaxation",
+        "music",
+        "busywork"
+      ]
+    };
+  },
   computed: {
     ...mapState({
-      current: state => state.todo.random.activity
-    })
+      current: state => state.todo.random,
+      list: state => state.todo.list
+    }),
+    currentItemComputed() {
+      let res = {
+        id: this.current.key,
+        activity: this.current.activity,
+        participants: this.participants,
+        price: this.price,
+        type: this.type
+      };
+
+      console.log("comp res", res);
+      return res;
+    },
+    queryComputed() {
+      // @TODO generate params for api request
+      return {};
+    }
   },
   created() {
     this.fetchRandom();
@@ -95,6 +142,12 @@ export default {
   methods: {
     fetchRandom() {
       this.$store.dispatch(types.ACTION_FETCH_RANDOM);
+    },
+    addToList() {
+      let duplicate = this.list.find(item => item.id === this.current.key);
+      if (!duplicate) {
+        this.$store.commit(types.MUTATE_ADD_TO_LIST, this.currentItemComputed);
+      }
     }
   }
 };
