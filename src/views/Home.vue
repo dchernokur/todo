@@ -6,7 +6,7 @@
 
         <div class="field">
           <div class="control">
-            {{ current.activity }}
+            {{ current.activity || "No activity matched :(" }}
           </div>
         </div>
       </div>
@@ -70,7 +70,11 @@
         <div class="column">
           <div class="field">
             <div class="control">
-              <button class="button is-primary is-fullwidth" @click="addToList">
+              <button
+                class="button is-primary is-fullwidth"
+                @click="addToList"
+                :disabled="!current.key"
+              >
                 Save for later
               </button>
             </div>
@@ -120,20 +124,20 @@ export default {
       list: state => state.todo.list
     }),
     currentItemComputed() {
-      let res = {
+      return {
         id: this.current.key,
         activity: this.current.activity,
         participants: this.participants,
         price: this.price,
         type: this.type
       };
-
-      console.log("comp res", res);
-      return res;
     },
-    queryComputed() {
-      // @TODO generate params for api request
-      return {};
+    paramsComputed() {
+      return {
+        participants: this.participants,
+        price: this.price,
+        type: this.type
+      };
     }
   },
   created() {
@@ -141,9 +145,14 @@ export default {
   },
   methods: {
     fetchRandom() {
-      this.$store.dispatch(types.ACTION_FETCH_RANDOM);
+      this.$store.dispatch(types.ACTION_FETCH_RANDOM, this.paramsComputed);
     },
     addToList() {
+      if (!this.current.key) {
+        console.error("No matched item to add");
+        return;
+      }
+
       let duplicate = this.list.find(item => item.id === this.current.key);
       if (!duplicate) {
         this.$store.commit(types.MUTATE_ADD_TO_LIST, this.currentItemComputed);
