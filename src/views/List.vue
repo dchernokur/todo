@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <table class="table">
+    <table class="table is-striped is-bordered is-fullwidth">
       <thead>
         <tr>
           <th>#</th>
@@ -12,8 +12,8 @@
       </thead>
 
       <tbody>
-        <tr v-for="item in list" :key="item.id">
-          <td>{{ item.id }}</td>
+        <tr v-for="(item, index) in list" :key="item.id">
+          <td>{{ index + 1 }}</td>
           <td>{{ item.activity }}</td>
           <td>{{ item.participants }}</td>
           <td>{{ parsePrice(item.price) }}</td>
