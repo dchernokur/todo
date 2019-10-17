@@ -127,9 +127,7 @@ export default {
       return {
         id: this.current.key,
         activity: this.current.activity,
-        participants: this.participants,
-        price: this.price,
-        type: this.type
+        ...this.paramsComputed
       };
     },
     paramsComputed() {
